@@ -14,7 +14,7 @@ class TabData {
   InAppWebViewController? controller;
   final TextEditingController urlController;
 
-  TabData({required this.url, this.title = "New Tab"}) 
+  TabData({required this.url, this.title = "New Tab"})
     : urlController = TextEditingController(text: url);
 }
 
@@ -29,12 +29,12 @@ class _MainWindowState extends State<MainWindow> {
   bool _isSettingsOpen = false;
   double _opacity = 0.8;
   final SettingsService _settings = SettingsService();
-  
+
   final List<TabData> _tabs = [
-    TabData(url: "https://www.google.com", title: "Google")
+    TabData(url: "https://www.google.com", title: "Google"),
   ];
   int _activeTabIndex = 0;
-  
+
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -58,11 +58,14 @@ class _MainWindowState extends State<MainWindow> {
 
   void _handleStealthKey(String key) {
     setState(() {
-      if (key == "\b" || key == "\u007F") { // Backspace
+      if (key == "\b" || key == "\u007F") {
+        // Backspace
         if (_activeTab.urlController.text.isNotEmpty) {
-          _activeTab.urlController.text = _activeTab.urlController.text.substring(0, _activeTab.urlController.text.length - 1);
+          _activeTab.urlController.text = _activeTab.urlController.text
+              .substring(0, _activeTab.urlController.text.length - 1);
         }
-      } else if (key == "\r" || key == "\n") { // Enter
+      } else if (key == "\r" || key == "\n") {
+        // Enter
         _loadUrl(_activeTab.urlController.text);
       } else {
         _activeTab.urlController.text += key;
@@ -77,52 +80,28 @@ class _MainWindowState extends State<MainWindow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Color(0XFFd8d9d4),
       body: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.4),
+              color: Color(0XFFd8d9d4),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.1), width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
-                  blurRadius: 20,
-                  spreadRadius: 5,
-                )
-              ],
             ),
             margin: const EdgeInsets.all(4),
             child: Column(
               children: [
-                _buildModernTitleBar(),
                 Expanded(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    child: _isSettingsOpen 
-                      ? SettingsPage(
-                          onOpacityChanged: (val) {
-                            setState(() {
-                              _opacity = val;
-                              _settings.transparency = val;
-                              _updateWindowOpacity();
-                            });
-                          },
-                          onHotkeyChanged: () {
-                            HotkeyService().registerHotkey(() {
-                              toggleWindow();
-                            });
-                          },
-                        )
-                      : Column(
-                          children: [
-                            _buildTabBar(),
-                            Expanded(child: _buildMainContent()),
-                          ],
-                        ),
+                    child: Column(
+                      children: [
+                        _buildTabBar(),
+                        Expanded(child: _buildMainContent()),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -139,7 +118,9 @@ class _MainWindowState extends State<MainWindow> {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.2),
-        border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.05))),
+        border: Border(
+          bottom: BorderSide(color: Colors.white.withOpacity(0.05)),
+        ),
       ),
       child: Row(
         children: [
@@ -155,8 +136,12 @@ class _MainWindowState extends State<MainWindow> {
                     margin: const EdgeInsets.only(right: 4, top: 4),
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.white.withOpacity(0.1) : Colors.transparent,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                      color: isSelected
+                          ? Colors.white.withOpacity(0.1)
+                          : Colors.transparent,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(8),
+                      ),
                     ),
                     constraints: const BoxConstraints(maxWidth: 150),
                     child: Row(
@@ -167,8 +152,12 @@ class _MainWindowState extends State<MainWindow> {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12,
-                              color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              color: isSelected
+                                  ? Colors.white
+                                  : Colors.white.withOpacity(0.5),
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                             ),
                           ),
                         ),
@@ -178,7 +167,9 @@ class _MainWindowState extends State<MainWindow> {
                             child: Icon(
                               Icons.close_rounded,
                               size: 14,
-                              color: isSelected ? Colors.white54 : Colors.white24,
+                              color: isSelected
+                                  ? Colors.white54
+                                  : Colors.white24,
                             ),
                           ),
                       ],
@@ -242,7 +233,7 @@ class _MainWindowState extends State<MainWindow> {
                 ),
               ),
             ),
-            
+
             // Quick Transparency Slider
             Flexible(
               child: SizedBox(
@@ -250,8 +241,12 @@ class _MainWindowState extends State<MainWindow> {
                 child: SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     trackHeight: 2,
-                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 10),
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 6,
+                    ),
+                    overlayShape: const RoundSliderOverlayShape(
+                      overlayRadius: 10,
+                    ),
                   ),
                   child: Slider(
                     value: _opacity,
@@ -268,17 +263,21 @@ class _MainWindowState extends State<MainWindow> {
                 ),
               ),
             ),
-            
+
             const SizedBox(width: 8),
             _buildIconButton(
-              icon: _isSettingsOpen ? Icons.home_rounded : Icons.settings_rounded,
-              onPressed: () => setState(() => _isSettingsOpen = !_isSettingsOpen),
+              icon: _isSettingsOpen
+                  ? Icons.home_rounded
+                  : Icons.settings_rounded,
+              onPressed: () =>
+                  setState(() => _isSettingsOpen = !_isSettingsOpen),
             ),
             const SizedBox(width: 12),
             _buildIconButton(
               icon: Icons.close_rounded,
               color: Colors.redAccent.withOpacity(0.8),
-              onPressed: () => toggleWindow(), // Call toggleWindow to hide natively
+              onPressed: () =>
+                  toggleWindow(), // Call toggleWindow to hide natively
             ),
           ],
         ),
@@ -286,7 +285,11 @@ class _MainWindowState extends State<MainWindow> {
     );
   }
 
-  Widget _buildIconButton({required IconData icon, required VoidCallback onPressed, Color? color}) {
+  Widget _buildIconButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    Color? color,
+  }) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -297,7 +300,11 @@ class _MainWindowState extends State<MainWindow> {
             color: color?.withOpacity(0.1) ?? Colors.white.withOpacity(0.05),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, size: 18, color: color ?? Colors.white.withOpacity(0.8)),
+          child: Icon(
+            icon,
+            size: 18,
+            color: color ?? Colors.white.withOpacity(0.8),
+          ),
         ),
       ),
     );
@@ -334,19 +341,28 @@ class _MainWindowState extends State<MainWindow> {
                     style: const TextStyle(fontSize: 13, color: Colors.white70),
                     decoration: InputDecoration(
                       hintText: "Search or enter URL...",
-                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+                      hintStyle: TextStyle(
+                        color: Colors.white.withOpacity(0.3),
+                      ),
                       border: InputBorder.none,
-                      prefixIcon: Icon(Icons.search_rounded, size: 18, color: Colors.white.withOpacity(0.3)),
+                      prefixIcon: Icon(
+                        Icons.search_rounded,
+                        size: 18,
+                        color: Colors.white.withOpacity(0.3),
+                      ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                      suffixIcon: _isLoading 
-                        ? Container(
-                            padding: const EdgeInsets.all(12),
-                            child: const CircularProgressIndicator(strokeWidth: 2, color: Colors.blueAccent),
-                          )
-                        : IconButton(
-                            icon: const Icon(Icons.refresh_rounded, size: 18),
-                            onPressed: () => _activeController?.reload(),
-                          ),
+                      suffixIcon: _isLoading
+                          ? Container(
+                              padding: const EdgeInsets.all(12),
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Color(0XFFd8d9d4),
+                              ),
+                            )
+                          : IconButton(
+                              icon: const Icon(Icons.refresh_rounded, size: 18),
+                              onPressed: () => _activeController?.reload(),
+                            ),
                     ),
                     onSubmitted: _loadUrl,
                   ),
@@ -364,10 +380,7 @@ class _MainWindowState extends State<MainWindow> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.white.withOpacity(0.05)),
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 10,
-                )
+                BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10),
               ],
             ),
             child: IndexedStack(
@@ -391,7 +404,8 @@ class _MainWindowState extends State<MainWindow> {
             transparentBackground: true,
             allowsInlineMediaPlayback: true,
             iframeAllowFullscreen: true,
-            userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+            userAgent:
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
           ),
           onWebViewCreated: (controller) {
             tab.controller = controller;
@@ -429,13 +443,15 @@ class _MainWindowState extends State<MainWindow> {
             }
           },
         ),
-        if (tab == _activeTab && _errorMessage != null)
-          _buildErrorView(),
+        if (tab == _activeTab && _errorMessage != null) _buildErrorView(),
       ],
     );
   }
 
-  Widget _buildNavButton({required IconData icon, required VoidCallback onPressed}) {
+  Widget _buildNavButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
     return IconButton(
       icon: Icon(icon, size: 16, color: Colors.white.withOpacity(0.6)),
       onPressed: onPressed,
@@ -451,7 +467,11 @@ class _MainWindowState extends State<MainWindow> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.cloud_off_rounded, color: Colors.white24, size: 64),
+            const Icon(
+              Icons.cloud_off_rounded,
+              color: Colors.white24,
+              size: 64,
+            ),
             const SizedBox(height: 24),
             Text(
               _errorMessage!,
@@ -466,7 +486,9 @@ class _MainWindowState extends State<MainWindow> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueAccent,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
               ),
             ),
           ],
@@ -474,13 +496,17 @@ class _MainWindowState extends State<MainWindow> {
       ),
     );
   }
+
   void _loadUrl(String val) {
     if (val.isEmpty) return;
 
     String url = val.trim();
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
       // Check if it looks like a domain (e.g., "google.com")
-      final domainRegExp = RegExp(r'^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$', caseSensitive: false);
+      final domainRegExp = RegExp(
+        r'^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$',
+        caseSensitive: false,
+      );
       if (domainRegExp.hasMatch(url)) {
         url = "https://$url";
       } else {
@@ -489,9 +515,7 @@ class _MainWindowState extends State<MainWindow> {
       }
     }
 
-    _activeController?.loadUrl(
-      urlRequest: URLRequest(url: WebUri(url))
-    );
+    _activeController?.loadUrl(urlRequest: URLRequest(url: WebUri(url)));
     _activeTab.urlController.text = url;
   }
 }
